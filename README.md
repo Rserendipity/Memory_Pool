@@ -1,2 +1,2 @@
 # Memory_Pool
-项目：内存池，使用RAII以及单例模式创建内存池，管理内存分配，减少碎片化内存
+参考：[谷歌开源项目tcmalloc](https://github.com/google/tcmalloc)
