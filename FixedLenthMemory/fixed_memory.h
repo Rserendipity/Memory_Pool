@@ -2,12 +2,13 @@
 #include <iostream>
 
 namespace cjj_memory_pool {
+	// 内存池项目不需要回收空间，直到程序结束才释放空间
 	// 定长的专用内存池
 	template<class T>
 	class FixedMemoryPool {
 	public:
 		// 申请不到空间时，会抛出bad_alloc异常
-		T* New() throw (std::bad_alloc)
+		T* New() throw(std::bad_alloc())
 		{
 			T* obj = nullptr;
 
@@ -18,30 +19,29 @@ namespace cjj_memory_pool {
 				obj = reinterpret_cast<T*>(_freeList);         // 使用C++11风格的类型转换
 				_freeList = *reinterpret_cast<void**>(_freeList);
 			}
-			else // 没有归还的空间			
+			else // 没有归还的空间
 			{
 				if (_leftMemSize < sizeof(T)) // 内存不足，重新申请一块空间
 				{
 					_leftMemSize = 128 * 1024;
 					_memory = reinterpret_cast<char*>(malloc(_leftMemSize));
-					if (_memory == nullptr)
+					if (_memory == nullptr) // 未申请到足够空间，抛出bad_alloc异常
 						throw std::bad_alloc();
 				}
-				// 至少分配4/8字节空间，留出足够的空间，给归还链表
+				// 至少分配4/8字节空间，留出足够的空间给归还链表
 				size_t objSize = sizeof(T) < sizeof(void*) ? sizeof(void*) : sizeof(T);
 				obj = reinterpret_cast<T*>(_memory);
 				_memory += objSize;
 				_leftMemSize -= objSize;
 			}
 
-			// 手动调用构造函数
+			// 显示调用T类型的构造函数 -- 定位new
 			new(obj)T;
 
 			return obj;
 		}
-
-		// 此函数不会引发异常
-		void Delete(T* obj) throw()
+		
+		void Delete(T* obj) noexcept // 此函数不会引发异常
 		{
 			// 析构
 			obj->~T();

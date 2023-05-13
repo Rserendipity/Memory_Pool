@@ -42,7 +42,7 @@ void Test_FixedMemory()
     size_t end1 = clock();
 
 
-    cjj_memory_pool::FixedMemoryPool<TreeNode> TNPool;
+    cjj_memory_pool::FixedMemoryPool<TreeNode> pool;
     size_t begin2 = clock();
     std::vector<TreeNode*> v2;
     v2.reserve(N);
@@ -50,11 +50,11 @@ void Test_FixedMemory()
     {
         for (int i = 0; i < N; ++i)
         {
-            v2.push_back(TNPool.New());
+            v2.push_back(pool.New());
         }
-        for (int i = 0; i < 100000; ++i)
+        for (int i = 0; i < N; ++i)
         {
-            TNPool.Delete(v2[i]);
+            pool.Delete(v2[i]);
         }
         v2.clear();
     }
@@ -62,9 +62,6 @@ void Test_FixedMemory()
     cout << "new time:" << end1 - begin1 << endl;
     cout << "pool time:" << end2 - begin2 << endl;
 }
-
-
-
 
 int main()
 {
